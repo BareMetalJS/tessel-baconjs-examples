@@ -32,8 +32,23 @@ This example shows how create a stream with events fired at a fixed interval. It
 
 Here we split a message String into a character array and fire each character to the screen half a second apart.
 
+Similar stream creation methods are `Bacon.interval(interval,value)` which creates a stream repeating the same value at a fixed interval; and `Bacon.repeatedly(interval, values)` which creates a stream sending the same list of values at a regular interval.
+
 ### button-to-led.js - Toggle a LED on each button press
 
-This example shows how to convert keypress events from the Tessel's CONFIG button into a stream of those events. Then using the stream's `onValue` method we can create a side effect that toggles one of the Tessel's status LEDs for each item in the stream.
+This example shows how to convert individual key press events from the Tessel's `config` button into a stream of those events. Then by passing a callback to the stream's `onValue` method we can create a side effect to toggle one of the Tessel's status LEDs for each item it finds in in the stream.
 
 The Tessel button API follows the Node.js EventEmitter pattern allowing us to use `Bacon.fromEventTarget` which creates a stream from events fired by an EventEmitter.
+
+### button-to-led2.js - Light a LED while the button is pressed
+
+This example turns on the Tessel's LED as long as the `config` button is held down. It introduces two new stream methods - `map` and `merge`.
+
+Firstly we create individual streams for button presses and releases as we did in the previous example. 
+
+We then call `map(1)` and `map(0)` on these streams respectively to turn the event objects on the streams into ones and zeros we can pass to the LED's `output` method.
+
+Note that while in this example `map` is returning a constant value for each input value, the more general case is to pass it a function to transform the input value.
+
+Finally we use `merge` to combine the two streams creating a stream of interleaved ones an zeros. We subscribe to the stream with `onValue` using the value of the stream to set the LED's state.
+
