@@ -52,3 +52,12 @@ Note that while in this example `map` is returning a constant value for each inp
 
 Lastly we use `merge` to combine the two streams, creating a stream of interleaved ones and zeros. We subscribe to that stream with `onValue` using the value of the stream to set the LED's state.
 
+### [accelerometer-threshold.js](accelerometer-threshold.js) - Light a LED while the accelerometer is within a certain threshold from zero
+
+This example turns on the Tessel's LED as long as the accelerometer X axis value is between negative and positive 0.5.
+
+It introduces Bacon properties. A property represents the current value of a stream. In our case that stream is the stream of _ready_ events from the accelerometer. This will actually be a single valued stream. We convert this to a property using `toProperty` after first mapping it to a stream of constant `true` values.
+
+We also introduce the `takeWhile(property)` method of observables (Observable is the common interface between properties and streams). This returns an observable which gives new values only while the given property's value is `true`. We use this to only emit data events once the acceleromter is ready.
+
+The rest of the example is similar to previous examples using LEDs. We convert the acceleromter data events into boolean events that we can use to set the value of the LED. Note that we could use a single mapping function here; I've just separated them for clarity.
